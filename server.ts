@@ -27,10 +27,10 @@ app.post(
 			try {
         const resizedImageBuffer = await sharp(req.file.buffer)
           .resize({
-            width: 1728,
-            height: 2160,
+            width: 1600,
+            height: 2200,
             fit: sharp.fit.contain,
-            background: {r: 255, g: 255, b: 255, alpha: 1},
+            background: {r: 0, g: 0, b: 0, alpha: 0},
           })
           .png()
           .toBuffer();
