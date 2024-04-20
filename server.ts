@@ -19,18 +19,21 @@ app.post(
   upload.single("image"),
 	async function (req: Request, res: Response) {
     if (req.file) {
-      const filename =
-        new Date().toISOString().replace(/:/g, "-") +
-        "-" +
-        req.file.originalname;
+      try {
+        const backgroudColor = { r: 0, g: 0, b: 0, alpha: 0 };
+        const margin = 0;
 
-			try {
         const resizedImageBuffer = await sharp(req.file.buffer)
           .resize({
             width: 1600,
             height: 2200,
             fit: sharp.fit.contain,
-            background: {r: 0, g: 0, b: 0, alpha: 0},
+            background: backgroudColor,
+          })
+          .extend({
+            left: margin,
+            right: margin,
+            background: backgroudColor,
           })
           .png()
           .toBuffer();
