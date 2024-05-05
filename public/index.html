@@ -69,7 +69,7 @@
       const formData = new FormData();
       formData.append("image", file);
 
-      fetch("http://localhost:3000/api/resize", {
+      fetch("https://tools.happytech.ca/api/resize", {
         method: "POST",
         body: formData,
       })
