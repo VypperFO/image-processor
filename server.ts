@@ -1,4 +1,4 @@
-import express, {Express, Request, Response} from "express";
+import express, { Express, Request, Response } from "express";
 import bodyParser from "body-parser";
 import multer from "multer";
 import sharp from "sharp";
@@ -12,19 +12,32 @@ app.use(cors());
 app.use(express.static("public"));
 
 const storage = multer.memoryStorage();
-const upload = multer({storage: storage});
+const upload = multer({ storage: storage });
 
 app.post(
   "/api/resize",
   upload.single("image"),
-	async function (req: Request, res: Response) {
+  async function (req: Request, res: Response) {
     if (req.file) {
       try {
-         const image = sharp(req.file.buffer);
-         const { data } = await image.raw().toBuffer({ resolveWithObject: true });
-         const backgroundColor = { r: data[0], g: data[1], b: data[2], alpha: data[3] / 255 };
+        // extract first pixel color
+        const image = sharp(req.file.buffer);
+        const { data } = await image
+          .raw()
+          .toBuffer({ resolveWithObject: true });
+        let backgroundColor = {
+          r: data[0],
+          g: data[1],
+          b: data[2],
+          alpha: data[3] / 255,
+        };
 
-         const margin = 0;
+        // if transparent
+        if (backgroundColor.alpha === 0) {
+          backgroundColor = { r: 255, g: 255, b: 255, alpha: 1 };
+        }
+
+        const margin = 0;
 
         const resizedImageBuffer = await sharp(req.file.buffer)
           .resize({
@@ -50,7 +63,7 @@ app.post(
         });
       }
     } else {
-      res.status(400).json({message: "No file uploaded"});
+      res.status(400).json({ message: "No file uploaded" });
     }
   }
 );
