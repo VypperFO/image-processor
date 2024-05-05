@@ -20,26 +20,28 @@ app.post(
 	async function (req: Request, res: Response) {
     if (req.file) {
       try {
-        const backgroudColor = { r: 0, g: 0, b: 0, alpha: 0 };
-        const margin = 0;
+         const image = sharp(req.file.buffer);
+         const { data } = await image.raw().toBuffer({ resolveWithObject: true });
+         const backgroundColor = { r: data[0], g: data[1], b: data[2], alpha: data[3] / 255 };
+
+         const margin = 0;
 
         const resizedImageBuffer = await sharp(req.file.buffer)
           .resize({
             width: 1600,
             height: 2200,
             fit: sharp.fit.contain,
-            background: backgroudColor,
+            background: backgroundColor,
           })
           .extend({
             left: margin,
             right: margin,
-            background: backgroudColor,
+            background: backgroundColor,
           })
           .png()
           .toBuffer();
 
         res.type("png");
-
         res.send(resizedImageBuffer);
       } catch (error: any) {
         res.status(500).json({
